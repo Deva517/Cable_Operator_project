@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Select Cable Network</title>
+
+<style>
+
+body{
+background-image: url("bg2.png");
+
+margin:0;
+font-family:Segoe UI;
+color:white;
+}
+
+.container{
+max-width:900px;
+margin:40px auto;
+padding:20px;
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+.search{
+width:100%;
+padding:12px;
+border-radius:8px;
+border:none;
+margin-bottom:20px;
+font-size:15px;
+}
+
+.card-list{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:15px;
+}
+
+.card{
+background:#1e2a35;
+padding:18px;
+border-radius:12px;
+cursor:pointer;
+transition:0.3s;
+border:2px solid transparent;
+}
+
+.card:hover{
+transform:translateY(-3px);
+border-color:#4cafef;
+}
+
+.card.selected{
+border-color:#4cafef;
+background:#243848;
+}
+
+.network-name{
+font-size:18px;
+font-weight:bold;
+}
+
+.network-info{
+font-size:13px;
+opacity:0.8;
+margin-top:6px;
+}
+
+button{
+margin-top:25px;
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+background:#4cafef;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#3498db;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📺 Select Your Cable Network</h1>
+
+<input type="text" class="search" id="search"
+placeholder="Search cable network...">
+
+<div class="card-list" id="networkList">
+
+<div class="card" onclick="selectCard(this)">
+<div class="network-name">City Digital Cable</div>
+<div class="network-info">Coverage: Hyderabad • Channels: 350+</div>
+</div>
+
+<div class="card" onclick="selectCard(this)">
+<div class="network-name">Star Vision Cable</div>
+<div class="network-info">Coverage: Secunderabad • Channels: 300+</div>
+</div>
+
+<div class="card" onclick="selectCard(this)">
+<div class="network-name">Mega TV Network</div>
+<div class="network-info">Coverage: Kukatpally • Channels: 280+</div>
+</div>
+
+<div class="card" onclick="selectCard(this)">
+<div class="network-name">SkyLine Cable</div>
+<div class="network-info">Coverage: Madhapur • Channels: 320+</div>
+</div>
+
+<div class="card" onclick="selectCard(this)">
+<div class="network-name">Local Digital Network</div>
+<div class="network-info">Coverage: Banjara Hills • Channels: 260+</div>
+</div>
+
+</div>
+
+<button onclick="continueNext()">Continue</button>
+
+</div>
+
+<script>
+
+let selectedNetwork="";
+
+function selectCard(card){
+
+document.querySelectorAll(".card")
+.forEach(c=>c.classList.remove("selected"));
+
+card.classList.add("selected");
+
+selectedNetwork=card.querySelector(".network-name").innerText;
+
+}
+
+function continueNext(){
+
+if(selectedNetwork===""){
+alert("Please select a network");
+return;
+}
+
+localStorage.setItem("network",selectedNetwork);
+alert("Selected Network: " + selectedNetwork);
+window.location.href="thirdpage.html";
+
+}
+
+document.getElementById("search").addEventListener("input",function(){
+
+let value=this.value.toLowerCase();
+
+document.querySelectorAll(".card").forEach(card=>{
+
+let name=card.innerText.toLowerCase();
+
+card.style.display=name.includes(value)?"block":"none";
+
+});
+
+});
+
+</script>
+
+</body>
+</html>

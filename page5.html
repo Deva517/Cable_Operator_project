@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Call Operator</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f1b24;
+    color: white;
+    padding: 20px;
+  }
+
+  .card {
+    max-width: 420px;
+    margin: 40px auto;
+    background: #1e2a35;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .status {
+    color: orange;
+    font-weight: bold;
+  }
+
+  .call-btn {
+    width: 100%;
+    background: #28a745;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+
+  .call-btn:hover {
+    background: #218838;
+  }
+
+  .response-btn {
+    width: 100%;
+    background: linear-gradient(135deg,#1e3c72,#2a5298);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+
+  .message {
+    margin-top: 12px;
+    text-align: center;
+    color: #f1c40f;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Call Operator</h1>
+
+<div class="card">
+
+  <h3 id="operatorName"></h3>
+  <p>📞 Phone: <span id="operatorPhone"></span></p>
+  <p>🆔 Job ID: <span id="jobId"></span></p>
+  <p>🕒 Call Time: <span id="callTime"></span></p>
+  <p>📌 Job Status: <span class="status" id="jobStatus">Pending</span></p>
+
+  <button class="call-btn" onclick="callOperator()">📞 Call Now</button>
+
+  <button class="response-btn" onclick="goToResponsePage()">
+    ✅ Go to Response Page
+  </button>
+
+  <p class="message" id="message"></p>
+
+</div>
+
+<script>
+
+
+
+// ----------------------
+// Operator master data
+// ----------------------
+
+const operators = {
+  "Ramesh": { phone: "9876543210", id: "OP001" },
+  "Suresh": { phone: "9123456780", id: "OP002" },
+  "Mahesh": { phone: "9012345678", id: "OP003" }
+};
+
+
+// ----------------------
+// Get selected operator
+// ----------------------
+
+let selectedOperator = localStorage.getItem("operatorName");
+
+if (!selectedOperator || !operators[selectedOperator]) {
+  alert("No operator selected!");
+  window.location.href = "page4.html";
+}
+
+
+// ----------------------
+// Display operator info
+// ----------------------
+
+document.getElementById("operatorName").innerText =
+  "Operator: " + selectedOperator;
+
+document.getElementById("operatorPhone").innerText =
+  operators[selectedOperator].phone;
+
+
+// ----------------------
+// Call time
+// ----------------------
+
+let callTime = new Date().toLocaleString();
+document.getElementById("callTime").innerText = callTime;
+
+
+// ----------------------
+// Call operator
+// ----------------------
+
+function callOperator() {
+
+  document.getElementById("message").innerText =
+    "Calling operator...";
+
+  document.getElementById("jobStatus").innerText =
+    "In Progress";
+
+  localStorage.setItem("jobStatus", "In Progress");
+
+  let userPhone = localStorage.getItem("userPhone") || "9876543210";
+  let problem = "No Signal";
+
+  fetch("http://localhost:3000/create-job", {
+
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify({
+      user_phone: userPhone,
+      operator: selectedOperator,
+      problem: problem
+    })
+
+  })
+  .then(res => res.json())
+  .then(data => {
+
+      let jobId = data.job_id;
+
+      document.getElementById("jobId").innerText = jobId;
+
+      localStorage.setItem("jobId", jobId);
+      localStorage.setItem("operatorId", operators[selectedOperator].id);
+      localStorage.setItem("callTime", callTime);
+
+      console.log("Job created with ID:", jobId);
+
+      window.location.href = "tel:" + operators[selectedOperator].phone;
+
+  })
+  .catch(err => console.error(err));
+}
+
+
+// ----------------------
+// Go to Page 6
+// ----------------------
+
+function goToResponsePage() {
+
+  window.location.href = "sixthpage.html";
+
+}
+
+</script>
+
+</body>
+</html>

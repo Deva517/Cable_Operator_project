@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Problem | CableCare</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body{
+      background: linear-gradient(135deg,#1e3c72,#2a5298);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* Main Card */
+    .app-card{
+      width:100%;
+      max-width:420px;
+      background:#fff;
+      border-radius:20px;
+      padding:30px 25px;
+      box-shadow:0 25px 40px rgba(0,0,0,0.2);
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn{
+      from{opacity:0; transform:translateY(30px);} 
+      to{opacity:1; transform:translateY(0);} 
+    }
+
+    /* Header */
+    .header{
+      text-align:center;
+      margin-bottom:25px;
+    }
+
+    .header h2{
+      color:#1e3c72;
+      font-weight:600;
+    }
+
+    .header p{
+      color:#777;
+      font-size:14px;
+      margin-top:5px;
+    }
+
+    /* Problem Grid */
+    .problem-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+      margin-bottom:25px;
+    }
+
+    /* Problem Card */
+    .problem-card{
+      background:#f7f9fc;
+      border:2px solid transparent;
+      border-radius:15px;
+      padding:18px 10px;
+      text-align:center;
+      cursor:pointer;
+      transition:0.3s ease;
+    }
+
+    .problem-card:hover{
+      transform:translateY(-3px);
+      box-shadow:0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    .problem-card.active{
+      border-color:#2a5298;
+      background:#eaf0ff;
+    }
+
+    .problem-icon{
+      font-size:28px;
+      margin-bottom:8px;
+    }
+
+    .problem-name{
+      font-size:14px;
+      font-weight:500;
+      color:#333;
+    }
+
+    /* Button */
+    .next-btn{
+      width:100%;
+      padding:14px;
+      background:linear-gradient(135deg,#1e3c72,#2a5298);
+      border:none;
+      border-radius:30px;
+      color:#fff;
+      font-size:16px;
+      font-weight:500;
+      cursor:pointer;
+      transition:0.3s ease;
+    }
+
+    .next-btn:hover{
+      opacity:0.9;
+      transform:scale(0.98);
+    }
+
+    /* Error */
+    .error{
+      color:#e53935;
+      text-align:center;
+      font-size:13px;
+      margin-top:10px;
+      min-height:18px;
+    }
+
+    /* Footer */
+    .footer{
+      text-align:center;
+      margin-top:18px;
+      font-size:12px;
+      color:#999;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="app-card">
+
+    <!-- Header -->
+    <div class="header">
+      <h2>Select Your Problem</h2>
+      <p>Choose the issue you are facing</p>
+    </div>
+
+    <!-- Problems -->
+    <div class="problem-grid">
+
+      <div class="problem-card" data-id="1" data-name="No Signal">
+        <div class="problem-icon">📡</div>
+        <div class="problem-name">No Signal</div>
+      </div>
+
+      <div class="problem-card" data-id="2" data-name="After Rain Issue">
+        <div class="problem-icon">🌧️</div>
+        <div class="problem-name">After Rain Issue</div>
+      </div>
+
+      <div class="problem-card" data-id="3" data-name="Cable Cut">
+        <div class="problem-icon">🔌</div>
+        <div class="problem-name">Cable Cut</div>
+      </div>
+
+      <div class="problem-card" data-id="4" data-name="Channels Missing">
+        <div class="problem-icon">📺</div>
+        <div class="problem-name">Channels Missing</div>
+      </div>
+
+    </div>
+
+    <!-- Button -->
+    <button class="next-btn" id="nextBtn">Continue</button>
+
+    <!-- Error -->
+    <div class="error" id="error"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+      © 2026 CableCare Support System
+    </div>
+
+  </div>
+
+
+<script>
+
+  const cards = document.querySelectorAll('.problem-card');
+  const nextBtn = document.getElementById('nextBtn');
+  const error = document.getElementById('error');
+
+  let selectedProblem = null;
+
+  // Select problem
+  cards.forEach(card => {
+
+    card.addEventListener('click', () => {
+
+      // Remove previous
+      cards.forEach(c => c.classList.remove('active'));
+
+      // Add active
+      card.classList.add('active');
+
+      // Save
+      selectedProblem = {
+        id: card.dataset.id,
+        name: card.dataset.name
+      };
+
+      error.innerText = '';
+
+    });
+
+  });
+
+  // Continue
+  nextBtn.addEventListener('click', () => {
+
+    if(!selectedProblem){
+      error.innerText = '⚠️ Please select a problem to continue';
+      return;
+    }
+
+    // Store data
+    localStorage.setItem('problem', JSON.stringify(selectedProblem));
+
+    // Redirect
+    window.location.href = 'page4.html';
+
+  });
+
+</script>
+
+</body>
+</html>

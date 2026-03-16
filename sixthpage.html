@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Service Status</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:'Segoe UI', sans-serif;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  padding:40px 20px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  background:
+  radial-gradient(circle at top left, #6dd5fa, transparent 40%),
+  radial-gradient(circle at bottom right, #2980b9, transparent 40%),
+  #1e3c72;
+}
+
+.card{
+  background:#fff;
+  width:360px;
+  padding:30px 25px;
+  border-radius:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.25);
+  text-align:center;
+  backdrop-filter: blur(8px);
+}
+
+.icon{
+  font-size:42px;
+  margin-bottom:10px;
+}
+
+h2{
+  margin-bottom:10px;
+  color:#1e3c72;
+}
+
+p{
+  font-size:14px;
+  color:#555;
+  margin-bottom:20px;
+}
+
+.btn{
+  width:100%;
+  padding:14px;
+  margin-top:12px;
+  border:none;
+  border-radius:30px;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.done-btn{
+  background:#28a745;
+  color:white;
+}
+
+.pending-btn{
+  background:#ffc107;
+  color:#333;
+}
+
+/* Thank box */
+
+.thank-box{
+  display:none;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:scale(0.95);}
+  to{opacity:1; transform:scale(1);}
+}
+
+.thank-icon{
+  font-size:48px;
+  margin-bottom:10px;
+}
+
+.thank-title{
+  color:#28a745;
+  margin-bottom:8px;
+}
+
+.thank-text{
+  font-size:14px;
+  color:#555;
+}
+
+.lbtn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(135deg,#1e3c72,#2a5298);
+  color:#fff;
+  font-size:15px;
+  cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<!-- Job confirmation section -->
+
+<div id="jobSection">
+
+<div class="icon">🛠️</div>
+<h2>Service Status</h2>
+
+<p>Is your cable problem fixed?</p>
+
+<button class="btn done-btn" onclick="markDone()">✅ Job Done</button>
+<button class="btn pending-btn" onclick="markPending()">⏳ Not Yet</button>
+
+</div>
+
+
+<!-- Thank you section -->
+
+<div class="thank-box" id="thankBox">
+
+<div class="thank-icon">🎉</div>
+<h2 class="thank-title">Service Completed!</h2>
+
+<p class="thank-text">
+Thank you for using our Cable Support App.<br>
+We’re happy to help you 📺
+</p>
+
+<button class="lbtn" onclick="goHome()">Back to Home</button>
+
+</div>
+
+</div>
+
+<div style="margin-top:40px; width:80%; max-width:900px; background:white; padding:20px; border-radius:10px;">
+
+<h3>Job History</h3>
+
+<table style="width:100%; border-collapse:collapse;">
+
+<tr style="background:#1e3c72; color:white;">
+<th>Job ID</th>
+<th>User Phone</th>
+<th>Operator</th>
+<th>Problem</th>
+<th>Status</th>
+<th>Time</th>
+</tr>
+
+<tbody id="jobsTable"></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+const MAX_JOBS_PER_DAY = 2;
+
+
+// Update operator workload (frontend tracking)
+
+function updateOperatorStatus(operatorName){
+
+  let jobsKey = "operator_" + operatorName + "_jobs";
+  let statusKey = "operator_" + operatorName + "_status";
+
+  let jobsDone = localStorage.getItem(jobsKey);
+  jobsDone = jobsDone ? parseInt(jobsDone) : 0;
+
+  jobsDone++;
+
+  localStorage.setItem(jobsKey, jobsDone);
+
+  if (jobsDone >= MAX_JOBS_PER_DAY) {
+    localStorage.setItem(statusKey, "Busy");
+  } else {
+    localStorage.setItem(statusKey, "Available");
+  }
+}
+
+
+// Job completed
+
+function markDone(){
+
+  localStorage.setItem("jobStatus", "Completed");
+
+  let operatorName = localStorage.getItem("operatorName");
+
+  let jobId = localStorage.getItem("jobId");   // ← important line
+
+  if (!operatorName) {
+    alert("Operator not found. Please select operator again.");
+    return;
+  }
+
+  if (!jobId) {
+    alert("Job ID not found!");
+    return;
+  }
+
+  // Update backend database
+
+  fetch("http://localhost:3000/update-job-status",{
+
+    method:"POST",
+
+    headers:{
+      "Content-Type":"application/json"
+    },
+
+    body: JSON.stringify({
+      job_id: parseInt(jobId),
+      status: "Completed"
+    })
+
+  })
+  .then(res => res.text())
+  .then(data => console.log("Backend:",data))
+  .catch(err => console.error(err));
+
+
+  updateOperatorStatus(operatorName);
+
+  document.getElementById("jobSection").style.display="none";
+  document.getElementById("thankBox").style.display="block";
+
+}
+
+
+// Back to home
+
+function goHome(){
+  window.location.href="secondpage.html";
+}
+
+
+// Job not completed
+
+function markPending(){
+
+  localStorage.setItem("jobStatus","Pending");
+
+  alert("Job marked as pending. You can contact the operator again.");
+
+}
+function loadJobs(){
+
+fetch("http://localhost:3000/jobs")
+.then(res=>res.json())
+.then(data=>{
+
+let table=document.getElementById("jobsTable");
+
+table.innerHTML="";
+
+data.forEach(job=>{
+
+table.innerHTML+=`
+<tr>
+<td>${job.job_id}</td>
+<td>${job.user_phone}</td>
+<td>${job.operator}</td>
+<td>${job.problem}</td>
+<td>${job.status}</td>
+<td>${job.time}</td>
+</tr>
+`;
+
+});
+
+});
+
+}
+
+loadJobs();
+</script>
+
+</body>
+</html>

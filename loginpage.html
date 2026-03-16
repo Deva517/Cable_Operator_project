@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cable Support App - Login</title>
+
+<style>
+
+body {
+margin: 0;
+height: 100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+background-image: url("bg.png");
+background-size: cover;
+background-position: center;
+font-family: 'Segoe UI', sans-serif;
+}
+
+.login-box {
+background: #ffffff;
+width: 340px;
+padding: 30px;
+border-radius: 12px;
+box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+animation: slideleft 0.6s ease;
+}
+
+@keyframes slideleft {
+from {
+transform: translateY(30px);
+opacity: 0;
+}
+to {
+transform: translateY(0);
+opacity: 1;
+}
+}
+
+h2 {
+text-align: center;
+margin-bottom: 5px;
+color: #333;
+}
+
+p {
+text-align: center;
+font-size: 14px;
+color: #666;
+margin-bottom: 20px;
+}
+
+input {
+width: 100%;
+padding: 12px;
+margin-top: 12px;
+border-radius: 8px;
+border: 1px solid #ccc;
+font-size: 14px;
+outline: none;
+}
+
+input:focus {
+border-color: #667eea;
+}
+
+button {
+width: 100%;
+padding: 12px;
+margin-top: 18px;
+background: #667eea;
+border: none;
+color: white;
+font-size: 15px;
+border-radius: 8px;
+cursor: pointer;
+transition: background 0.3s;
+}
+
+button:hover {
+background: #5a67d8;
+}
+
+.hidden {
+display: none;
+}
+
+.message {
+margin-top: 12px;
+text-align: center;
+font-size: 14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+<h2>Welcome 👋</h2>
+<p>Login to continue</p>
+
+<input type="text" id="mobile" placeholder="Enter mobile number" style="width:8.3cm;">
+
+<button onclick="sendOTP()">Send OTP</button>
+
+<div id="otpSection" class="hidden">
+<input type="text" id="otp" placeholder="Enter OTP">
+<button onclick="verifyOTP()">Verify & Login</button>
+</div>
+
+<div class="message" id="message"></div>
+</div>
+
+<script>
+
+let generatedOTP = "1234";
+
+function sendOTP() {
+
+let mobile = document.getElementById("mobile").value;
+let message = document.getElementById("message");
+
+if (mobile.length !== 10 || isNaN(mobile)) {
+message.style.color = "red";
+message.innerText = "Enter valid 10-digit mobile number";
+return;
+}
+
+// Generate random OTP
+generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
+alert("Your OTP is: " + generatedOTP);
+
+document.getElementById("otpSection").classList.remove("hidden");
+
+message.style.color = "green";
+message.innerText = "OTP sent successfully";
+
+}
+
+function verifyOTP() {
+
+let enteredOTP = document.getElementById("otp").value;
+let mobile = document.getElementById("mobile").value;
+let message = document.getElementById("message");
+
+if (enteredOTP === generatedOTP) {
+
+message.style.color = "green";
+message.innerText = "Login successful 🎉";
+
+localStorage.setItem("isLoggedIn", "true");
+
+// SEND LOGIN TO BACKEND
+fetch("http://localhost:3000/login", {
+
+method: "POST",
+
+headers: {
+"Content-Type": "application/json"
+},
+
+body: JSON.stringify({
+phone_number: mobile
+})
+
+})
+.then(res => res.text())
+.then(data => console.log("Backend:", data))
+.catch(err => console.error(err));
+
+setTimeout(() => {
+window.location.href = "secondpage.html";
+}, 1000);
+
+}
+
+else {
+
+message.style.color = "red";
+message.innerText = "Invalid OTP. Try again";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
