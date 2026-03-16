@@ -1,11 +1,13 @@
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
 const db = new sqlite3.Database("./database.db");
 
@@ -68,6 +70,12 @@ CREATE TABLE IF NOT EXISTS jobs (
     time TEXT
 )
 `);
+
+
+// ROOT PAGE → LOGIN PAGE
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "loginpage.html"));
+});
 
 
 // LOGIN API
@@ -183,6 +191,8 @@ app.post("/update-job-status", (req, res) => {
 
 });
 
+
+// RESET SYSTEM
 app.get("/reset-data", (req, res) => {
 
     db.run("DELETE FROM jobs", function(err) {
@@ -211,6 +221,8 @@ app.get("/reset-data", (req, res) => {
     });
 
 });
+
+
 // GET ALL JOBS
 app.get("/jobs", (req, res) => {
 
@@ -227,6 +239,11 @@ app.get("/jobs", (req, res) => {
     });
 
 });
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
+
+
+// START SERVER (Render compatible)
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log("Server running on port " + PORT);
 });
