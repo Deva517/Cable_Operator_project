@@ -115,6 +115,8 @@ font-size: 14px;
 
 <script>
 
+
+
 let generatedOTP = "1234";
 
 function sendOTP() {
@@ -128,7 +130,6 @@ message.innerText = "Enter valid 10-digit mobile number";
 return;
 }
 
-// Generate random OTP
 generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
 alert("Your OTP is: " + generatedOTP);
@@ -153,38 +154,32 @@ message.innerText = "Login successful 🎉";
 
 localStorage.setItem("isLoggedIn", "true");
 
-// SEND LOGIN TO BACKEND
-fetch("http://localhost:3000/login", {
-
+// ✅ UPDATED API
+fetch("https://cable-operator-app.onrender.com/login", {
 method: "POST",
-
 headers: {
 "Content-Type": "application/json"
 },
-
 body: JSON.stringify({
 phone_number: mobile
 })
-
 })
-.then(res => res.text())
-.then(data => console.log("Backend:", data))
-.catch(err => console.error(err));
 
 setTimeout(() => {
 window.location.href = "secondpage.html";
 }, 1000);
 
-}
-
-else {
-
+} else {
 message.style.color = "red";
 message.innerText = "Invalid OTP. Try again";
-
 }
 
 }
+
+
+
+
+
 
 </script>
 
