@@ -46,10 +46,12 @@
 
 </form>
 
+
+
 <script>
 
-// Load operators from backend
-fetch("http://localhost:3000/operators")
+// ✅ UPDATED API
+fetch("https://cable-operator-app.onrender.com/operators")
 .then(res => res.json())
 .then(data => {
 
@@ -69,7 +71,6 @@ fetch("http://localhost:3000/operators")
       <p>Jobs today: ${op.jobs_today}</p>
     `;
 
-    // If operator is busy disable selection
     if(op.status === "Busy"){
       card.classList.add("disabled");
       card.querySelector("input").disabled = true;
@@ -81,8 +82,6 @@ fetch("http://localhost:3000/operators")
 
 });
 
-
-// Next button
 function goNext(){
 
   let selected = document.querySelector('input[name="operator"]:checked');
@@ -93,7 +92,6 @@ function goNext(){
   }
 
   localStorage.setItem("operatorName", selected.value);
-
   window.location.href = "page5.html";
 
 }
