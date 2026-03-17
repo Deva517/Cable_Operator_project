@@ -103,8 +103,9 @@ app.get("/", (req, res) => {
 app.post("/login", (req, res) => {
 
     const phone = req.body.phone_number;
-    const time = new Date().toLocaleString();
-
+    const time = new Date().toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata"
+});
     db.run(
         "INSERT INTO users (phone_number, login_time) VALUES (?, ?)",
         [phone, time],
@@ -150,7 +151,9 @@ app.post("/create-job", (req, res) => {
     const problem = req.body.problem;
 
     const status = "Pending";
-    const time = new Date().toLocaleString();
+    const time = new Date().toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata"
+});
 
     db.run(
         "INSERT INTO jobs (user_phone, operator, problem, status, time) VALUES (?, ?, ?, ?, ?)",
