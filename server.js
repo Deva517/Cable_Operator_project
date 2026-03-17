@@ -12,18 +12,39 @@ app.use(express.static(__dirname));
 const db = new sqlite3.Database("./database.db");
 
 
-// Reset operators every 24 hours
-setInterval(() => {
-
+// ✅ MIDNIGHT RESET LOGIC
+function resetOperators() {
     db.run(`
-    UPDATE operators
-    SET jobs_today = 0,
-        status = 'Available'
+        UPDATE operators
+        SET jobs_today = 0,
+            status = 'Available'
     `);
 
-    console.log("Operators reset for new day");
+    console.log("Operators reset at midnight");
+}
 
-}, 60 * 1000);
+function scheduleMidnightReset() {
+
+    const now = new Date();
+
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0); // next 12 AM
+
+    const timeUntilMidnight = midnight - now;
+
+    console.log("Next reset in ms:", timeUntilMidnight);
+
+    setTimeout(() => {
+        resetOperators();
+
+        // repeat every 24 hours
+        setInterval(resetOperators, 24 * 60 * 60 * 1000);
+
+    }, timeUntilMidnight);
+}
+
+// start scheduler
+scheduleMidnightReset();
 
 
 // USERS TABLE
@@ -192,7 +213,7 @@ app.post("/update-job-status", (req, res) => {
 });
 
 
-// RESET SYSTEM
+// RESET SYSTEM (manual)
 app.get("/reset-data", (req, res) => {
 
     db.run("DELETE FROM jobs", function(err) {
@@ -241,7 +262,7 @@ app.get("/jobs", (req, res) => {
 });
 
 
-// START SERVER (Render compatible)
+// START SERVER
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
