@@ -59,7 +59,7 @@ A full-stack web application that helps users report cable issues, assign operat
 
 ---
 
-## 👥 Team Members
+## 👥 Our team
 
 - Devendra
 - Nandini.M.K
